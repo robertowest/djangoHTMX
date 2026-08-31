@@ -2,6 +2,8 @@
 
 Proyecto Django configurado con HTMX para crear aplicaciones web modernas con actualizaciones parciales del DOM sin necesidad de JavaScript personalizado.
 
+![screensave](pantalla1.png)
+
 ## Stack
 
 - **Backend:** Django 5.2 + Django REST Framework
