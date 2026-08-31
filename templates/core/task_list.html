@@ -1,0 +1,116 @@
+{% extends 'base.html' %}
+
+{% block title %}Gestión de Tareas{% endblock %}
+
+{% block content %}
+<div class="row">
+    <div class="col-md-12">
+        <div class="d-flex justify-content-between align-items-center mb-4">
+            <h1>📋 Gestión de Tareas</h1>
+            <button
+                type="button"
+                class="btn btn-primary"
+                data-bs-toggle="modal"
+                data-bs-target="#taskModal"
+                hx-get="{% url 'core:task_form_modal' %}"
+                hx-target="#taskModalContent"
+            >
+                ➕ Nueva Tarea
+            </button>
+        </div>
+
+        <!-- Filtros con HTMX -->
+        <div class="card mb-4">
+            <div class="card-header bg-light">
+                <h5 class="mb-0">🔍 Filtros</h5>
+            </div>
+            <div class="card-body">
+                <form
+                    hx-get="{% url 'core:task_list' %}"
+                    hx-target="#taskTableContainer"
+                    class="row g-3"
+                >
+                    <div class="col-md-4">
+                        <select name="status" class="form-select">
+                            <option value="">Todos los estados</option>
+                            <option value="pending">Pendiente</option>
+                            <option value="in_progress">En progreso</option>
+                            <option value="completed">Completada</option>
+                        </select>
+                    </div>
+                    <div class="col-md-4">
+                        <select name="priority" class="form-select">
+                            <option value="">Todas las prioridades</option>
+                            <option value="low">Baja</option>
+                            <option value="medium">Media</option>
+                            <option value="high">Alta</option>
+                        </select>
+                    </div>
+                    <div class="col-md-4">
+                        <input
+                            type="text"
+                            name="search"
+                            class="form-control"
+                            placeholder="Buscar por título..."
+                        >
+                    </div>
+                    <div class="col-md-12">
+                        <button type="submit" class="btn btn-sm btn-outline-primary">
+                            Filtrar
+                        </button>
+                        <button
+                            type="reset"
+                            class="btn btn-sm btn-outline-secondary"
+                            onclick="document.querySelector('[hx-trigger]').click()"
+                        >
+                            Limpiar
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+
+        <!-- Tabla de tareas -->
+        <div id="taskTableContainer">
+            {% include 'core/task_table.html' %}
+        </div>
+    </div>
+</div>
+
+<!-- Modal para crear/editar tarea -->
+<div class="modal fade" id="taskModal" tabindex="-1">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">Tarea</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body" id="taskModalContent">
+                <!-- contenido cargado por HTMX -->
+            </div>
+        </div>
+    </div>
+</div>
+
+{% endblock %}
+
+{% block extra_js %}
+<script>
+    // configuramos HTMX para cerrar el modal después de guardar
+    htmx.on('htmx:afterSwap', function(event) {
+        if (event.detail.xhr.status === 201 || event.detail.xhr.status === 200) {
+            const modal = bootstrap.Modal.getInstance(document.getElementById('taskModal'));
+            if (modal) {
+                modal.hide();
+            }
+        }
+    });
+
+    // configuramos validación de formularios
+    document.addEventListener('htmx:configRequest', function(event) {
+        if (event.detail.verb === 'POST') {
+            event.detail.headers['X-Requested-With'] = 'XMLHttpRequest';
+        }
+    });
+</script>
+{% endblock %}

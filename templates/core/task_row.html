@@ -1,0 +1,49 @@
+<tr id="task-{{ task.id }}">
+    <td>
+        <strong>{{ task.title }}</strong>
+        {% if task.description %}
+            <br>
+            <small class="text-muted">{{ task.description|truncatewords:10 }}</small>
+        {% endif %}
+    </td>
+    <td>
+        {% if task.status == 'pending' %}
+            <span class="badge bg-secondary">Pendiente</span>
+        {% elif task.status == 'in_progress' %}
+            <span class="badge bg-warning text-dark">En progreso</span>
+        {% elif task.status == 'completed' %}
+            <span class="badge bg-success">Completada</span>
+        {% endif %}
+    </td>
+    <td>
+        {% if task.priority == 'low' %}
+            <span class="badge bg-success">Baja</span>
+        {% elif task.priority == 'medium' %}
+            <span class="badge bg-info">Media</span>
+        {% elif task.priority == 'high' %}
+            <span class="badge bg-danger">Alta</span>
+        {% endif %}
+    </td>
+    <td>
+        <small class="text-muted">{{ task.created_at|date:"d/m/Y H:i" }}</small>
+    </td>
+    <td class="text-end">
+        <button
+            class="btn btn-sm btn-outline-primary"
+            data-bs-toggle="modal"
+            data-bs-target="#taskModal"
+            hx-get="{% url 'core:edit_task' task.id %}"
+            hx-target="#taskModalContent"
+        >
+            ✏️
+        </button>
+        <button
+            class="btn btn-sm btn-outline-danger"
+            hx-delete="{% url 'core:delete_task' task.id %}"
+            hx-confirm="¿Estás seguro de que deseas eliminar esta tarea?"
+            hx-swap="swap 0.6s"
+        >
+            🗑️
+        </button>
+    </td>
+</tr>

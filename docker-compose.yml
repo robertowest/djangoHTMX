@@ -1,0 +1,45 @@
+version: '3.8'
+
+services:
+  # base de datos postgresql
+  db:
+    image: postgres:16-alpine
+    environment:
+      POSTGRES_DB: django_htmx
+      POSTGRES_USER: django
+      POSTGRES_PASSWORD: django_password
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U django -d django_htmx"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  # aplicación django
+  web:
+    build: .
+    command: >
+      sh -c "
+      python manage.py migrate &&
+      python manage.py runserver 0.0.0.0:8000
+      "
+    ports:
+      - "8000:8000"
+    environment:
+      DEBUG: "True"
+      SECRET_KEY: "django-insecure-dev-key"
+      DATABASE_URL: "postgresql://django:django_password@db:5432/django_htmx"
+      ALLOWED_HOSTS: "localhost,127.0.0.1,web"
+    depends_on:
+      db:
+        condition: service_healthy
+    volumes:
+      - .:/app
+    stdin_open: true
+    tty: true
+
+volumes:
+  postgres_data:

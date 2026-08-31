@@ -1,0 +1,76 @@
+{% load crispy_forms_tags %}
+
+<form
+    {% if task %}
+        hx-post="{% url 'core:edit_task' task.id %}"
+    {% else %}
+        hx-post="{% url 'core:create_task' %}"
+    {% endif %}
+    hx-target="#taskTableContainer"
+    hx-swap="innerHTML"
+    class="needs-validation"
+>
+    {% csrf_token %}
+
+    {% if form.non_field_errors %}
+        <div class="alert alert-danger" role="alert">
+            {% for error in form.non_field_errors %}
+                <div>{{ error }}</div>
+            {% endfor %}
+        </div>
+    {% endif %}
+
+    <div class="mb-3">
+        <label for="{{ form.title.id_for_label }}" class="form-label">Título *</label>
+        {{ form.title }}
+        {% if form.title.errors %}
+            <div class="invalid-feedback d-block">
+                {{ form.title.errors.0 }}
+            </div>
+        {% endif %}
+    </div>
+
+    <div class="mb-3">
+        <label for="{{ form.description.id_for_label }}" class="form-label">Descripción</label>
+        {{ form.description }}
+        {% if form.description.errors %}
+            <div class="invalid-feedback d-block">
+                {{ form.description.errors.0 }}
+            </div>
+        {% endif %}
+    </div>
+
+    <div class="row">
+        <div class="col-md-6">
+            <div class="mb-3">
+                <label for="{{ form.priority.id_for_label }}" class="form-label">Prioridad</label>
+                {{ form.priority }}
+                {% if form.priority.errors %}
+                    <div class="invalid-feedback d-block">
+                        {{ form.priority.errors.0 }}
+                    </div>
+                {% endif %}
+            </div>
+        </div>
+        <div class="col-md-6">
+            <div class="mb-3">
+                <label for="{{ form.status.id_for_label }}" class="form-label">Estado</label>
+                {{ form.status }}
+                {% if form.status.errors %}
+                    <div class="invalid-feedback d-block">
+                        {{ form.status.errors.0 }}
+                    </div>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+
+    <div class="d-flex gap-2">
+        <button type="submit" class="btn btn-primary">
+            💾 Guardar
+        </button>
+        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">
+            ✕ Cancelar
+        </button>
+    </div>
+</form>
